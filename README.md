@@ -1,6 +1,6 @@
 # Kondor JS
 
-Library to interact with Kondor extension for Koinos blockchain.
+Library to interact with Kondor, the browser extension for Koinos blockchain.
 
 ## Table of Contents
 
@@ -21,7 +21,7 @@ You can also load it directly to the browser by downloading the bunble file loca
 
 ## Usage
 
-### Browser
+### Vanilla JS
 
 ```html
 <!DOCTYPE html>
@@ -29,23 +29,23 @@ You can also load it directly to the browser by downloading the bunble file loca
   <head>
     <meta charset="utf-8" />
     <title>My App</title>
-    <script src="koinos.min.js"></script>
+    <script src="kondor.min.js"></script>
+    <script src="koilib.min.js"></script>
     <script>
       (async () => {
-        const provider = new Provider(["http://api.koinos.io:8080"]);
-        const signer = Signer.fromSeed("my seed");
-        signer.provider = provider;
         const koinContract = new Contract({
           id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
           abi: utils.tokenAbi,
-          provider,
-          signer,
+          provider: kondor.provider,
+          signer: kondor.signer,
         });
         const koin = koinContract.functions;
 
+        const accounts = await kondor.getAccounts();
+
         // Get balance
         const { result } = await koin.balanceOf({
-          owner: signer.getAddress(),
+          owner: accounts[0].address,
         });
         console.log(balance.result);
       })();
@@ -53,6 +53,33 @@ You can also load it directly to the browser by downloading the bunble file loca
   </head>
   <body></body>
 </html>
+```
+
+NOTE: For koilib check https://github.com/joticajulian/koilib
+
+### Using a framework
+
+```ts
+import * as kondor from "kondor-js";
+import { Contract, utils } from "koilib";
+
+(async () => {
+  const koinContract = new Contract({
+    id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+    abi: utils.tokenAbi,
+    provider: kondor.provider,
+    signer: kondor.signer,
+  });
+  const koin = koinContract.functions;
+
+  const accounts = await kondor.getAccounts();
+
+  // Get balance
+  const { result } = await koin.balanceOf({
+    owner: accounts[0].address,
+  });
+  console.log(balance.result);
+})();
 ```
 
 ## Acknowledgments
