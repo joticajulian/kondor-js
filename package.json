@@ -1,0 +1,54 @@
+{
+  "name": "kondor-js",
+  "version": "0.1.0",
+  "description": "Kondor Library",
+  "author": "Julian Gonzalez",
+  "repository": {
+    "url": "https://github.com/joticajulian/kondor-js.git"
+  },
+  "homepage": "https://github.com/joticajulian/kondor-js.git",
+  "bugs": {
+    "url": "https://github.com/joticajulian/kondor-js/issues"
+  },
+  "files": [
+    "lib",
+    "dist"
+  ],
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "browser": "./lib/browser/index.js",
+  "scripts": {
+    "build": "rimraf lib/browser && tsc -p tsconfig.browser.json",    
+    "bundle": "yarn bundle:no-min && yarn bundle:min",
+    "bundle:min": "webpack --mode=production --config webpack.prod.config.js",
+    "bundle:no-min": "webpack --mode=production --config webpack.dev.config.js",
+    "lint": "yarn lint:prettier && yarn lint:eslint && yarn lint:tsc",
+    "lint:prettier": "prettier . --check",
+    "lint:eslint": "eslint . --ext .js,.ts",
+    "lint:tsc": "tsc --noEmit --incremental false",
+    "prerelease": "yarn bundle && yarn build"
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": "./lib/index.js"
+  },
+  "dependencies": {
+    "koilib": "^3.1.0"
+  },
+  "devDependencies": {
+    "@tsconfig/node12": "^1.0.9",
+    "@types/chrome": "^0.0.176",
+    "@typescript-eslint/eslint-plugin": "^5.10.0",
+    "@typescript-eslint/parser": "^5.10.0",
+    "eslint": "^8.7.0",
+    "eslint-config-airbnb-typescript": "^16.1.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-prettier": "^4.0.0",
+    "rimraf": "^3.0.2",
+    "ts-loader": "~8.2.0",
+    "typescript": "^4.5.4",
+    "webpack": "^5.66.0",
+    "webpack-cli": "^4.9.1"
+  }
+}
