@@ -82,6 +82,10 @@ import { Contract, utils } from "koilib";
 })();
 ```
 
+## Test
+
+Run `yarn serve` and open in the browser `http://localhost:8081/test.html`. This page contains a basic example to get accounts and make a transfer using Kondor.
+
 ## Acknowledgments
 
 Many thanks to the sponsors of this library: @levineam, @Amikob, @motoeng, @isaacdozier, @imjwalker, and the private sponsors.
