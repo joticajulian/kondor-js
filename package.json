@@ -34,9 +34,7 @@
     "./package.json": "./package.json",
     ".": "./lib/index.js"
   },
-  "dependencies": {
-    "koilib": "^3.1.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@tsconfig/node12": "^1.0.9",
     "@types/chrome": "^0.0.176",
@@ -50,6 +48,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "fastify": "^3.26.0",
     "fastify-static": "^4.5.0",
+    "koilib": "^3.1.1",
     "prettier": "^2.5.1",
     "rimraf": "^3.0.2",
     "ts-loader": "~8.2.0",
