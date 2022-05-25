@@ -18,11 +18,14 @@ function getError(e) {
     // console.debug(e);
     return "unknown kondor error";
 }
+async function sleep(ms) {
+    return new Promise((r) => setTimeout(r, ms));
+}
 class Messenger {
     constructor(opts) {
         this.listeners = [];
-        this.onExtensionRequest = async () => ({});
-        this.onDomRequest = async () => ({});
+        this.onExtensionRequest = () => Promise.resolve();
+        this.onDomRequest = () => Promise.resolve();
         if (!opts)
             return;
         if (opts.onExtensionRequest) {
@@ -33,7 +36,7 @@ class Messenger {
                 // check if it is a MessageRequest
                 if (!command)
                     return;
-                let message = { id };
+                const message = { id };
                 // console.debug("incoming request", id, ":", command);
                 // console.debug((data as MessageRequest).args);
                 try {
@@ -64,7 +67,7 @@ class Messenger {
                 // check if it is a MessageRequest
                 if (!command)
                     return;
-                let message = { id };
+                const message = { id };
                 // console.debug("incoming request", id, ":", command);
                 // console.debug((event.data as MessageRequest).args);
                 try {
@@ -203,11 +206,11 @@ class Messenger {
             if (opts && opts.ping) {
                 (async () => {
                     let retries = (opts === null || opts === void 0 ? void 0 : opts.retries) || 0;
-                    await new Promise((r) => setTimeout(r, 1000));
+                    await sleep(1000);
                     while (this.listeners.find((l) => l.id === reqId)) {
                         try {
-                            await this.sendExtensionMessage(to, "ping", { id: reqId, to }, { timeout: 80 });
-                            await new Promise((r) => setTimeout(r, 1000));
+                            await this.sendExtensionMessage(to, "ping", { id: reqId, to }, { timeout: (opts === null || opts === void 0 ? void 0 : opts.pingTimeout) || 80 });
+                            await sleep(1000);
                         }
                         catch (error) {
                             if (retries <= 0) {
@@ -218,10 +221,15 @@ class Messenger {
                             retries -= 1;
                             console.log(`retrying ${reqId}. remaining retries: ${retries}`);
                             sendMessage();
-                            await new Promise((r) => setTimeout(r, 100));
+                            await sleep(100);
                         }
                     }
-                })();
+                })()
+                    .then(() => { })
+                    .catch((e) => {
+                    console.log("ping error:");
+                    console.log(e);
+                });
             }
         });
     }
