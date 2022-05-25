@@ -1,2 +1,4 @@
 dist
 lib
+test/js
+test/server.js

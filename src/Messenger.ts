@@ -40,11 +40,11 @@ type OnDomRequest = (
   id: string
 ) => Promise<unknown | { derived: boolean }>;
 
-type extensionListener = (
+type ExtensionListener = (
   request: Message,
   sender: Sender,
   res: () => void
-) => void;
+) => void | Promise<void>;
 
 declare const crypto: {
   randomUUID: () => string;
@@ -53,8 +53,8 @@ declare const crypto: {
 declare const chrome: {
   runtime: {
     onMessage: {
-      addListener: (listener: extensionListener) => void;
-      removeListener: (listener: extensionListener) => void;
+      addListener: (listener: ExtensionListener) => void;
+      removeListener: (listener: ExtensionListener) => void;
     };
     sendMessage: (message: Message) => void;
   };
@@ -89,6 +89,10 @@ function getError(e: unknown): string {
   return "unknown kondor error";
 }
 
+async function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
 export default class Messenger {
   public onExtensionRequest: OnExtensionRequest;
 
@@ -104,25 +108,25 @@ export default class Messenger {
     onDomRequest?: OnDomRequest;
     onExtensionRequest?: OnExtensionRequest;
   }) {
-    this.onExtensionRequest = async () => ({});
-    this.onDomRequest = async () => ({});
+    this.onExtensionRequest = () => Promise.resolve();
+    this.onDomRequest = () => Promise.resolve();
 
     if (!opts) return;
 
     if (opts.onExtensionRequest) {
       this.onExtensionRequest = opts.onExtensionRequest;
-      const listener: extensionListener = async (data, sender, res) => {
+      const listener: ExtensionListener = async (data, sender, res) => {
         res();
         const { id, command } = data as MessageRequest;
         // check if it is a MessageRequest
         if (!command) return;
 
-        let message: MessageResponse = { id };
+        const message: MessageResponse = { id };
         // console.debug("incoming request", id, ":", command);
         // console.debug((data as MessageRequest).args);
 
         try {
-          const result = await this.onExtensionRequest!(
+          const result = await this.onExtensionRequest(
             data as MessageRequest,
             id,
             sender
@@ -157,12 +161,12 @@ export default class Messenger {
         // check if it is a MessageRequest
         if (!command) return;
 
-        let message: MessageResponse = { id };
+        const message: MessageResponse = { id };
         // console.debug("incoming request", id, ":", command);
         // console.debug((event.data as MessageRequest).args);
 
         try {
-          const result = await this.onDomRequest!(
+          const result = await this.onDomRequest(
             event as Event<MessageRequest>,
             id
           );
@@ -260,13 +264,14 @@ export default class Messenger {
     opts?: {
       timeout?: number;
       ping?: boolean;
+      pingTimeout?: number;
       retries?: number;
     }
   ): Promise<T> {
     const reqId = crypto.randomUUID();
     return new Promise((resolve: (result: T) => void, reject) => {
       // prepare the listener
-      const listener: extensionListener = (data, _sender, res) => {
+      const listener: ExtensionListener = (data, _sender, res) => {
         res();
 
         // ignore requests
@@ -329,16 +334,16 @@ export default class Messenger {
       if (opts && opts.ping) {
         (async () => {
           let retries = opts?.retries || 0;
-          await new Promise((r) => setTimeout(r, 1000));
+          await sleep(1000);
           while (this.listeners.find((l) => l.id === reqId)) {
             try {
               await this.sendExtensionMessage(
                 to,
                 "ping",
                 { id: reqId, to },
-                { timeout: 80 }
+                { timeout: opts?.pingTimeout || 80 }
               );
-              await new Promise((r) => setTimeout(r, 1000));
+              await sleep(1000);
             } catch (error) {
               if (retries <= 0) {
                 reject(error);
@@ -348,10 +353,15 @@ export default class Messenger {
               retries -= 1;
               console.log(`retrying ${reqId}. remaining retries: ${retries}`);
               sendMessage();
-              await new Promise((r) => setTimeout(r, 100));
+              await sleep(100);
             }
           }
-        })();
+        })()
+          .then(() => {})
+          .catch((e) => {
+            console.log("ping error:");
+            console.log(e);
+          });
       }
     });
   }
@@ -367,7 +377,7 @@ export default class Messenger {
         listener as (event: Event<Message>) => unknown
       );
     } else {
-      chrome.runtime.onMessage.removeListener(listener as extensionListener);
+      chrome.runtime.onMessage.removeListener(listener as ExtensionListener);
     }
   }
 
@@ -380,7 +390,7 @@ export default class Messenger {
           listener as (event: Event<Message>) => unknown
         );
       } else {
-        chrome.runtime.onMessage.removeListener(listener as extensionListener);
+        chrome.runtime.onMessage.removeListener(listener as ExtensionListener);
       }
     });
     this.listeners = [];

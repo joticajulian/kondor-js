@@ -115,7 +115,9 @@ export const provider = {
     });
   },
 
-  async sendTransaction(transaction: TransactionJson): Promise<{}> {
+  async sendTransaction(
+    transaction: TransactionJson
+  ): Promise<Record<string, unknown>> {
     await messenger.sendDomMessage("background", "provider:sendTransaction", {
       transaction,
     });
