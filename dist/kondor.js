@@ -136,7 +136,7 @@ class Messenger {
             window.postMessage({
                 id: reqId,
                 command,
-                args,
+                args: JSON.parse(JSON.stringify(args)),
                 to,
             }, "*");
             // console.debug("sending message", reqId, command, "to dom");
@@ -178,7 +178,7 @@ class Messenger {
                     chrome.runtime.sendMessage({
                         id: reqId,
                         command,
-                        args,
+                        args: JSON.parse(JSON.stringify(args)),
                         to,
                     });
                 }
@@ -187,7 +187,7 @@ class Messenger {
                     chrome.tabs.sendMessage(to, {
                         id: reqId,
                         command,
-                        args,
+                        args: JSON.parse(JSON.stringify(args)),
                         to,
                     });
                 }
@@ -343,10 +343,9 @@ exports.provider = {
         });
     },
     async sendTransaction(transaction) {
-        await messenger.sendDomMessage("background", "provider:sendTransaction", {
+        return messenger.sendDomMessage("background", "provider:sendTransaction", {
             transaction,
         });
-        return {};
     },
     async submitBlock(block) {
         return messenger.sendDomMessage("background", "provider:submitBlock", {
