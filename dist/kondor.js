@@ -136,7 +136,7 @@ class Messenger {
             window.postMessage({
                 id: reqId,
                 command,
-                args: JSON.parse(JSON.stringify(args)),
+                args: args ? JSON.parse(JSON.stringify(args)) : args,
                 to,
             }, "*");
             // console.debug("sending message", reqId, command, "to dom");
@@ -178,7 +178,7 @@ class Messenger {
                     chrome.runtime.sendMessage({
                         id: reqId,
                         command,
-                        args: JSON.parse(JSON.stringify(args)),
+                        args: args ? JSON.parse(JSON.stringify(args)) : args,
                         to,
                     });
                 }
@@ -187,7 +187,7 @@ class Messenger {
                     chrome.tabs.sendMessage(to, {
                         id: reqId,
                         command,
-                        args: JSON.parse(JSON.stringify(args)),
+                        args: args ? JSON.parse(JSON.stringify(args)) : args,
                         to,
                     });
                 }
