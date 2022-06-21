@@ -118,10 +118,9 @@ export const provider = {
   async sendTransaction(
     transaction: TransactionJson
   ): Promise<Record<string, unknown>> {
-    await messenger.sendDomMessage("background", "provider:sendTransaction", {
+    return messenger.sendDomMessage("background", "provider:sendTransaction", {
       transaction,
     });
-    return {};
   },
 
   async submitBlock(block: BlockJson): Promise<Record<string, never>> {

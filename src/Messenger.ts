@@ -247,7 +247,7 @@ export default class Messenger {
         {
           id: reqId,
           command,
-          args,
+          args: JSON.parse(JSON.stringify(args)),
           to,
         },
         "*"
@@ -305,7 +305,7 @@ export default class Messenger {
           chrome.runtime.sendMessage({
             id: reqId,
             command,
-            args,
+            args: JSON.parse(JSON.stringify(args)),
             to,
           });
         } else {
@@ -313,7 +313,7 @@ export default class Messenger {
           chrome.tabs.sendMessage(to as number, {
             id: reqId,
             command,
-            args,
+            args: JSON.parse(JSON.stringify(args)),
             to,
           });
         }
