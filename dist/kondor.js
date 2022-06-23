@@ -344,7 +344,7 @@ exports.provider = {
     },
     async sendTransaction(tx) {
         const response = await messenger.sendDomMessage("background", "provider:sendTransaction", {
-            tx,
+            transaction: tx,
         });
         response.transaction.wait = async (type = "byBlock", timeout = 60000) => {
             return messenger.sendDomMessage("background", "provider:wait", {
@@ -469,7 +469,7 @@ function getSigner(signerAddress) {
         sendTransaction: async (tx, abis) => {
             const response = await messenger.sendDomMessage("popup", "signer:sendTransaction", {
                 signerAddress,
-                tx,
+                transaction: tx,
                 abis,
             });
             response.transaction.wait = async (type = "byBlock", timeout = 60000) => {
