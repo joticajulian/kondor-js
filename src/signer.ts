@@ -153,30 +153,25 @@ export function getSigner(signerAddress: string): SignerInterface {
       receipt: TransactionReceipt;
       transaction: TransactionJsonWait;
     }> => {
-      const { transaction, receipt } = await messenger.sendDomMessage<{
+      const response = await messenger.sendDomMessage<{
         receipt: TransactionReceipt;
-        transaction: TransactionJson;
+        transaction: TransactionJsonWait;
       }>("popup", "signer:sendTransaction", {
         signerAddress,
         tx,
         abis,
       });
-      return {
-        receipt,
-        transaction: {
-          ...transaction,
-          wait: async (
-            type: "byTransactionId" | "byBlock" = "byBlock",
-            timeout = 60000
-          ) => {
-            return messenger.sendDomMessage("background", "provider:wait", {
-              txId: transaction.id,
-              type,
-              timeout,
-            });
-          },
-        },
+      response.transaction.wait = async (
+        type: "byTransactionId" | "byBlock" = "byBlock",
+        timeout = 60000
+      ) => {
+        return messenger.sendDomMessage("background", "provider:wait", {
+          txId: response.transaction.id,
+          type,
+          timeout,
+        });
       };
+      return response;
     },
 
     prepareBlock: (): Promise<BlockJson> => {

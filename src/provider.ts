@@ -3,6 +3,8 @@ import {
   BlockJson,
   CallContractOperationJson,
   TransactionJson,
+  TransactionJsonWait,
+  TransactionReceipt,
 } from "koilib/lib/interface";
 
 const messenger = new Messenger({});
@@ -115,12 +117,27 @@ export const provider = {
     });
   },
 
-  async sendTransaction(
-    transaction: TransactionJson
-  ): Promise<Record<string, unknown>> {
-    return messenger.sendDomMessage("background", "provider:sendTransaction", {
-      transaction,
+  async sendTransaction(tx: TransactionJson): Promise<{
+    receipt: TransactionReceipt;
+    transaction: TransactionJsonWait;
+  }> {
+    const response = await messenger.sendDomMessage<{
+      receipt: TransactionReceipt;
+      transaction: TransactionJsonWait;
+    }>("background", "provider:sendTransaction", {
+      tx,
     });
+    response.transaction.wait = async (
+      type: "byTransactionId" | "byBlock" = "byBlock",
+      timeout = 60000
+    ) => {
+      return messenger.sendDomMessage("background", "provider:wait", {
+        txId: response.transaction.id,
+        type,
+        timeout,
+      });
+    };
+    return response;
   },
 
   async submitBlock(block: BlockJson): Promise<Record<string, never>> {

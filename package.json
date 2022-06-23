@@ -35,7 +35,7 @@
     ".": "./lib/index.js"
   },
   "dependencies": {
-    "koilib": "^3.1.1"
+    "koilib": "^4.1.2"
   },
   "devDependencies": {
     "@tsconfig/node12": "^1.0.9",
