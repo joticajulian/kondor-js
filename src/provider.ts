@@ -117,7 +117,7 @@ export const provider = {
     });
   },
 
-  async sendTransaction(tx: TransactionJson): Promise<{
+  async sendTransaction(transaction: TransactionJson): Promise<{
     receipt: TransactionReceipt;
     transaction: TransactionJsonWait;
   }> {
@@ -125,7 +125,7 @@ export const provider = {
       receipt: TransactionReceipt;
       transaction: TransactionJsonWait;
     }>("background", "provider:sendTransaction", {
-      transaction: tx,
+      transaction,
     });
     response.transaction.wait = async (
       type: "byTransactionId" | "byBlock" = "byBlock",

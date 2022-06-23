@@ -72,7 +72,7 @@ export const signer: SignerInterface = {
       receipt: TransactionReceipt;
       transaction: TransactionJson;
     }>("popup", "signer:sendTransaction", {
-      tx,
+      transaction: tx,
       abis,
     });
     return {
@@ -132,7 +132,7 @@ export function getSigner(signerAddress: string): SignerInterface {
     },
 
     signTransaction: async (
-      tx: TransactionJson,
+      transaction: TransactionJson,
       abis?: Record<string, Abi>
     ): Promise<TransactionJson> => {
       return messenger.sendDomMessage<TransactionJson>(
@@ -140,7 +140,7 @@ export function getSigner(signerAddress: string): SignerInterface {
         "signer:signTransaction",
         {
           signerAddress,
-          tx,
+          transaction,
           abis,
         }
       );

@@ -342,9 +342,9 @@ exports.provider = {
             timeout,
         });
     },
-    async sendTransaction(tx) {
+    async sendTransaction(transaction) {
         const response = await messenger.sendDomMessage("background", "provider:sendTransaction", {
-            transaction: tx,
+            transaction,
         });
         response.transaction.wait = async (type = "byBlock", timeout = 60000) => {
             return messenger.sendDomMessage("background", "provider:wait", {
@@ -419,7 +419,7 @@ exports.signer = {
     sendTransaction: async (tx, abis) => {
         warnDeprecated("sendTransaction");
         const { transaction, receipt } = await messenger.sendDomMessage("popup", "signer:sendTransaction", {
-            tx,
+            transaction: tx,
             abis,
         });
         return {
@@ -459,10 +459,10 @@ function getSigner(signerAddress) {
             const tx = await messenger.sendDomMessage("background", "signer:prepareTransaction", { signerAddress, transaction });
             return tx;
         },
-        signTransaction: async (tx, abis) => {
+        signTransaction: async (transaction, abis) => {
             return messenger.sendDomMessage("popup", "signer:signTransaction", {
                 signerAddress,
-                tx,
+                transaction,
                 abis,
             });
         },
