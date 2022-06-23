@@ -158,7 +158,7 @@ export function getSigner(signerAddress: string): SignerInterface {
         transaction: TransactionJsonWait;
       }>("popup", "signer:sendTransaction", {
         signerAddress,
-        tx,
+        transaction: tx,
         abis,
       });
       response.transaction.wait = async (
