@@ -342,10 +342,18 @@ exports.provider = {
             timeout,
         });
     },
-    async sendTransaction(transaction) {
-        return messenger.sendDomMessage("background", "provider:sendTransaction", {
-            transaction,
+    async sendTransaction(tx) {
+        const response = await messenger.sendDomMessage("background", "provider:sendTransaction", {
+            tx,
         });
+        response.transaction.wait = async (type = "byBlock", timeout = 60000) => {
+            return messenger.sendDomMessage("background", "provider:wait", {
+                txId: response.transaction.id,
+                type,
+                timeout,
+            });
+        };
+        return response;
     },
     async submitBlock(block) {
         return messenger.sendDomMessage("background", "provider:submitBlock", {
@@ -459,24 +467,19 @@ function getSigner(signerAddress) {
             });
         },
         sendTransaction: async (tx, abis) => {
-            const { transaction, receipt } = await messenger.sendDomMessage("popup", "signer:sendTransaction", {
+            const response = await messenger.sendDomMessage("popup", "signer:sendTransaction", {
                 signerAddress,
                 tx,
                 abis,
             });
-            return {
-                receipt,
-                transaction: {
-                    ...transaction,
-                    wait: async (type = "byBlock", timeout = 60000) => {
-                        return messenger.sendDomMessage("background", "provider:wait", {
-                            txId: transaction.id,
-                            type,
-                            timeout,
-                        });
-                    },
-                },
+            response.transaction.wait = async (type = "byBlock", timeout = 60000) => {
+                return messenger.sendDomMessage("background", "provider:wait", {
+                    txId: response.transaction.id,
+                    type,
+                    timeout,
+                });
             };
+            return response;
         },
         prepareBlock: () => {
             throw new Error("prepareBlock is not available");
