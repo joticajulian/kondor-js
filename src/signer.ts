@@ -39,7 +39,9 @@ export const signer: SignerInterface = {
   },
   signMessage: (): Promise<Uint8Array> => {
     warnDeprecated("signMessage");
-    throw new Error("signMessae is not available. Use sendTransaction instead");
+    throw new Error(
+      "signMessage is not available. Use sendTransaction instead"
+    );
   },
   prepareBlock: (): Promise<BlockJson> => {
     warnDeprecated("prepareBlock");
@@ -62,6 +64,7 @@ export const signer: SignerInterface = {
   },
   sendTransaction: async (
     tx: TransactionJson,
+    broadcast?: boolean,
     abis?: Record<string, Abi>
   ): Promise<{
     receipt: TransactionReceipt;
@@ -73,6 +76,7 @@ export const signer: SignerInterface = {
       transaction: TransactionJson;
     }>("popup", "signer:sendTransaction", {
       transaction: tx,
+      broadcast,
       abis,
     });
     return {
@@ -148,6 +152,7 @@ export function getSigner(signerAddress: string): SignerInterface {
 
     sendTransaction: async (
       tx: TransactionJson,
+      broadcast?: boolean,
       abis?: Record<string, Abi>
     ): Promise<{
       receipt: TransactionReceipt;
@@ -159,6 +164,7 @@ export function getSigner(signerAddress: string): SignerInterface {
       }>("popup", "signer:sendTransaction", {
         signerAddress,
         transaction: tx,
+        broadcast,
         abis,
       });
       response.transaction.wait = async (

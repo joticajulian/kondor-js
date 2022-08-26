@@ -35,27 +35,27 @@
     ".": "./lib/index.js"
   },
   "dependencies": {
-    "koilib": "^4.1.2"
+    "koilib": "^5.0.0"
   },
   "devDependencies": {
-    "@tsconfig/node12": "^1.0.9",
-    "@types/chrome": "^0.0.176",
-    "@typescript-eslint/eslint-plugin": "^5.10.0",
-    "@typescript-eslint/parser": "^5.10.0",
+    "@tsconfig/node12": "^1.0.11",
+    "@types/chrome": "^0.0.195",
+    "@typescript-eslint/eslint-plugin": "^5.35.1",
+    "@typescript-eslint/parser": "^5.35.1",
     "copyfiles": "^2.4.1",
-    "eslint": "^8.7.0",
-    "eslint-config-airbnb-typescript": "^16.1.0",
+    "eslint": "^8.22.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.4",
-    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-tsdoc": "^0.2.16",
     "fastify": "^3.26.0",
     "fastify-static": "^4.5.0",
-    "prettier": "^2.5.1",
+    "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
     "ts-loader": "~8.2.0",
-    "typescript": "^4.5.4",
-    "webpack": "^5.66.0",
-    "webpack-cli": "^4.9.1"
+    "typescript": "^4.8.2",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0"
   }
 }
