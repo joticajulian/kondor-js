@@ -342,9 +342,10 @@ exports.provider = {
             timeout,
         });
     },
-    async sendTransaction(transaction) {
+    async sendTransaction(transaction, broadcast = true) {
         const response = await messenger.sendDomMessage("background", "provider:sendTransaction", {
             transaction,
+            broadcast,
         });
         response.transaction.wait = async (type = "byBlock", timeout = 60000) => {
             return messenger.sendDomMessage("background", "provider:wait", {
@@ -401,7 +402,7 @@ exports.signer = {
     },
     signMessage: () => {
         warnDeprecated("signMessage");
-        throw new Error("signMessae is not available. Use sendTransaction instead");
+        throw new Error("signMessage is not available. Use sendTransaction instead");
     },
     prepareBlock: () => {
         warnDeprecated("prepareBlock");
@@ -416,10 +417,11 @@ exports.signer = {
         const tx = await messenger.sendDomMessage("background", "signer:prepareTransaction", { transaction });
         return tx;
     },
-    sendTransaction: async (tx, abis) => {
+    sendTransaction: async (tx, broadcast, abis) => {
         warnDeprecated("sendTransaction");
         const { transaction, receipt } = await messenger.sendDomMessage("popup", "signer:sendTransaction", {
             transaction: tx,
+            broadcast,
             abis,
         });
         return {
@@ -466,10 +468,11 @@ function getSigner(signerAddress) {
                 abis,
             });
         },
-        sendTransaction: async (tx, abis) => {
+        sendTransaction: async (tx, broadcast, abis) => {
             const response = await messenger.sendDomMessage("popup", "signer:sendTransaction", {
                 signerAddress,
                 transaction: tx,
+                broadcast,
                 abis,
             });
             response.transaction.wait = async (type = "byBlock", timeout = 60000) => {
