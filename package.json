@@ -1,6 +1,6 @@
 {
   "name": "kondor-js",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Kondor Library",
   "author": "Julian Gonzalez",
   "repository": {
@@ -14,8 +14,8 @@
     "lib",
     "dist"
   ],
-  "main": "./lib/index.js",
-  "types": "./lib/index.d.ts",
+  "main": "./lib/browser/index.js",
+  "types": "./lib/browser/index.d.ts",
   "browser": "./lib/browser/index.js",
   "scripts": {
     "build": "rimraf lib/browser && tsc -p tsconfig.browser.json",
@@ -32,7 +32,7 @@
   },
   "exports": {
     "./package.json": "./package.json",
-    ".": "./lib/index.js"
+    ".": "./lib/browser/index.js"
   },
   "dependencies": {
     "koilib": "^5.0.0"
