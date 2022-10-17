@@ -1,102 +1,14 @@
 import { SignerInterface } from "koilib";
 import { Messenger } from "./Messenger";
 import {
-  Abi,
   BlockJson,
+  SendTransactionOptions,
   TransactionJson,
   TransactionJsonWait,
   TransactionReceipt,
 } from "koilib/lib/interface";
 
 const messenger = new Messenger({});
-
-function warnDeprecated(fnName: string) {
-  console.warn(
-    `The function kondor.signer.${fnName} will be deprecated in the future. Please use kondor.getSigner(signerAddress).${fnName}`
-  );
-}
-
-export const signer: SignerInterface = {
-  getAddress: (): string => {
-    warnDeprecated("getAddress");
-    throw new Error(
-      "getAddress is not available. Please use getAccounts from kondor"
-    );
-  },
-  getPrivateKey: (): string => {
-    warnDeprecated("getPrivateKey");
-    throw new Error("getPrivateKey is not available");
-  },
-  signTransaction: (): Promise<TransactionJson> => {
-    warnDeprecated("signTransaction");
-    throw new Error(
-      "signTransaction is not available. Use sendTransaction instead"
-    );
-  },
-  signHash: (): Promise<Uint8Array> => {
-    warnDeprecated("signHash");
-    throw new Error("signHash is not available. Use sendTransaction instead");
-  },
-  signMessage: (): Promise<Uint8Array> => {
-    warnDeprecated("signMessage");
-    throw new Error(
-      "signMessage is not available. Use sendTransaction instead"
-    );
-  },
-  prepareBlock: (): Promise<BlockJson> => {
-    warnDeprecated("prepareBlock");
-    throw new Error("prepareBlock is not available");
-  },
-  signBlock: (): Promise<BlockJson> => {
-    warnDeprecated("signBlock");
-    throw new Error("signBlock is not available");
-  },
-  prepareTransaction: async (
-    transaction: TransactionJson
-  ): Promise<TransactionJson> => {
-    warnDeprecated("prepareTransaction");
-    const tx = await messenger.sendDomMessage<TransactionJson>(
-      "background",
-      "signer:prepareTransaction",
-      { transaction }
-    );
-    return tx;
-  },
-  sendTransaction: async (
-    tx: TransactionJson,
-    broadcast?: boolean,
-    abis?: Record<string, Abi>
-  ): Promise<{
-    receipt: TransactionReceipt;
-    transaction: TransactionJsonWait;
-  }> => {
-    warnDeprecated("sendTransaction");
-    const { transaction, receipt } = await messenger.sendDomMessage<{
-      receipt: TransactionReceipt;
-      transaction: TransactionJson;
-    }>("popup", "signer:sendTransaction", {
-      transaction: tx,
-      broadcast,
-      abis,
-    });
-    return {
-      receipt,
-      transaction: {
-        ...transaction,
-        wait: async (
-          type: "byTransactionId" | "byBlock" = "byBlock",
-          timeout = 30000
-        ) => {
-          return messenger.sendDomMessage("background", "provider:wait", {
-            txId: transaction.id,
-            type,
-            timeout,
-          });
-        },
-      },
-    };
-  },
-};
 
 export function getSigner(signerAddress: string): SignerInterface {
   return {
@@ -137,7 +49,7 @@ export function getSigner(signerAddress: string): SignerInterface {
 
     signTransaction: async (
       transaction: TransactionJson,
-      abis?: Record<string, Abi>
+      abis?: SendTransactionOptions["abis"]
     ): Promise<TransactionJson> => {
       return messenger.sendDomMessage<TransactionJson>(
         "popup",
@@ -152,8 +64,7 @@ export function getSigner(signerAddress: string): SignerInterface {
 
     sendTransaction: async (
       tx: TransactionJson,
-      broadcast?: boolean,
-      abis?: Record<string, Abi>
+      optsSend?: SendTransactionOptions
     ): Promise<{
       receipt: TransactionReceipt;
       transaction: TransactionJsonWait;
@@ -164,8 +75,7 @@ export function getSigner(signerAddress: string): SignerInterface {
       }>("popup", "signer:sendTransaction", {
         signerAddress,
         transaction: tx,
-        broadcast,
-        abis,
+        optsSend,
       });
       response.transaction.wait = async (
         type: "byTransactionId" | "byBlock" = "byBlock",
