@@ -44,14 +44,16 @@ export function getSigner(signerAddress: string): SignerInterface {
         "signer:prepareTransaction",
         { signerAddress, transaction }
       );
-      return tx;
+      transaction.id = tx.id;
+      transaction.header = tx.header;
+      return transaction;
     },
 
     signTransaction: async (
       transaction: TransactionJson,
       abis?: SendTransactionOptions["abis"]
     ): Promise<TransactionJson> => {
-      return messenger.sendDomMessage<TransactionJson>(
+      const tx = await messenger.sendDomMessage<TransactionJson>(
         "popup",
         "signer:signTransaction",
         {
@@ -60,6 +62,8 @@ export function getSigner(signerAddress: string): SignerInterface {
           abis,
         }
       );
+      transaction.signatures = tx.signatures;
+      return transaction;
     },
 
     sendTransaction: async (
@@ -69,6 +73,9 @@ export function getSigner(signerAddress: string): SignerInterface {
       receipt: TransactionReceipt;
       transaction: TransactionJsonWait;
     }> => {
+      if (optsSend?.beforeSend) {
+        throw new Error("beforeSend option is not supported in kondor");
+      }
       const response = await messenger.sendDomMessage<{
         receipt: TransactionReceipt;
         transaction: TransactionJsonWait;
