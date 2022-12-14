@@ -400,16 +400,23 @@ function getSigner(signerAddress) {
         },
         prepareTransaction: async (transaction) => {
             const tx = await messenger.sendDomMessage("background", "signer:prepareTransaction", { signerAddress, transaction });
-            return tx;
+            transaction.id = tx.id;
+            transaction.header = tx.header;
+            return transaction;
         },
         signTransaction: async (transaction, abis) => {
-            return messenger.sendDomMessage("popup", "signer:signTransaction", {
+            const tx = await messenger.sendDomMessage("popup", "signer:signTransaction", {
                 signerAddress,
                 transaction,
                 abis,
             });
+            transaction.signatures = tx.signatures;
+            return transaction;
         },
         sendTransaction: async (tx, optsSend) => {
+            if (optsSend === null || optsSend === void 0 ? void 0 : optsSend.beforeSend) {
+                throw new Error("beforeSend option is not supported in kondor");
+            }
             const response = await messenger.sendDomMessage("popup", "signer:sendTransaction", {
                 signerAddress,
                 transaction: tx,
