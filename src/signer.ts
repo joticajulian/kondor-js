@@ -1,4 +1,4 @@
-import { SignerInterface } from "koilib";
+import { SignerInterface, Provider, Signer } from "koilib";
 import { Messenger } from "./Messenger";
 import {
   BlockJson,
@@ -10,7 +10,20 @@ import {
 
 const messenger = new Messenger({});
 
-export function getSigner(signerAddress: string): SignerInterface {
+export function getSigner(
+  signerAddress: string,
+  options?: {
+    /**
+     * When providerPrepareTransaction is defined then
+     * the prepareTransaction function will use that provider
+     * to prepare the transaction rather than calling the extension.
+     *
+     * TODO: this is a temporal solution to fix the problem with
+     * the double popup.
+     */
+    providerPrepareTransaction: Provider;
+  }
+): SignerInterface {
   return {
     getAddress: () => signerAddress,
 
@@ -39,6 +52,19 @@ export function getSigner(signerAddress: string): SignerInterface {
     prepareTransaction: async (
       transaction: TransactionJson
     ): Promise<TransactionJson> => {
+      if (options && options.providerPrepareTransaction) {
+        const signer = Signer.fromSeed("seed");
+        signer.provider = options.providerPrepareTransaction;
+        if (!transaction.header) {
+          transaction.header = { payer: signerAddress };
+        }
+
+        if (!transaction.header.payer) {
+          transaction.header.payer = signerAddress;
+        }
+        return signer.prepareTransaction(transaction);
+      }
+
       const tx = await messenger.sendDomMessage<TransactionJson>(
         "background",
         "signer:prepareTransaction",
