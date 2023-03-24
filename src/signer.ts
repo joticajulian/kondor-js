@@ -21,7 +21,8 @@ export function getSigner(
      * TODO: this is a temporal solution to fix the problem with
      * the double popup.
      */
-    providerPrepareTransaction: Provider;
+    providerPrepareTransaction?: Provider;
+    network?: string;
   }
 ): SignerInterface {
   return {
@@ -65,10 +66,12 @@ export function getSigner(
         return signer.prepareTransaction(transaction);
       }
 
+      const network = options ? options.network : "";
+
       const tx = await messenger.sendDomMessage<TransactionJson>(
         "background",
         "signer:prepareTransaction",
-        { signerAddress, transaction }
+        { network, signerAddress, transaction }
       );
       transaction.id = tx.id;
       transaction.header = tx.header;
