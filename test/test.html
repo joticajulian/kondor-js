@@ -16,6 +16,13 @@
       <input id="value" type="text" />
       <button onclick="transferKoin()">Transfer</button>
     </div>
+    <div class="group">
+      <label for="from2">From:</label>
+      <input id="from2" type="text" />
+      <label for="message">Message:</label>
+      <input id="message" type="text" />
+      <button onclick="signMessage()">Sign message</button>
+    </div>
     <div id="result"></div>
     <script src="js/kondor.min.js"></script>
     <script src="js/koinos.min.js"></script>
@@ -23,6 +30,8 @@
       const inputFrom = document.getElementById("from");
       const inputTo = document.getElementById("to");
       const inputValue = document.getElementById("value");
+      const inputFrom2 = document.getElementById("from2");
+      const inputMessage = document.getElementById("message");
       const elResult = document.getElementById("result");
 
       const divResult = {
@@ -48,13 +57,18 @@
 
       async function transferKoin() {
         divResult.hide();
+        const s = kondor.getSigner(inputFrom.value);
+        const provider = new Provider(["https://harbinger-api.koinos.io"]);
+        s.provider = provider;
         try {
           // contract definition
           const koin = new Contract({
             id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
             abi: utils.tokenAbi,
-            provider: kondor.provider,
-            signer: kondor.getSigner(inputFrom.value),
+            provider: kondor.getProvider("harbinger"),
+            signer: kondor.getSigner(inputFrom.value, {
+              providerPrepareTransaction: provider,
+            }),
           }).functions;
 
           // transfer
@@ -66,6 +80,9 @@
             },
             {
               payer: inputFrom.value,
+              sendTransaction: false,
+              //rcLimit: "10",
+              //nonce: "KAE=",
             }
           );
           console.log(`transaction ${transaction.id} submitted. Receipt:`);
@@ -90,6 +107,27 @@
           divResult.show(
             `transaction ${transaction.id} submitted. Mined in block ${blockNumber}. New balance ${result.value}`
           );
+        } catch (error) {
+          divResult.show(`Error: ${error.message}`);
+          console.error(error);
+        }
+      }
+
+      async function signMessage() {
+        divResult.hide();
+        const signer = kondor.getSigner(inputFrom2.value);
+        try {
+          const signature = await signer.signMessage(inputMessage.value);
+          console.log(signature);
+          divResult.show(signature);
+
+          const data = new TextEncoder().encode(inputMessage.value);
+          const hash = await crypto.subtle.digest("SHA-256", data);
+          const recoveredAddress = Signer.recoverAddress(
+            new Uint8Array(hash),
+            signature
+          );
+          console.log(`recovered address: ${recoveredAddress}`);
         } catch (error) {
           divResult.show(`Error: ${error.message}`);
           console.error(error);
