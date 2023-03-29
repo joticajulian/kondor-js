@@ -1,4 +1,4 @@
-import { SignerInterface, Provider, Signer } from "koilib";
+import { SignerInterface, Provider, Signer, utils } from "koilib";
 import { Messenger } from "./Messenger";
 import {
   BlockJson,
@@ -39,8 +39,8 @@ export function getSigner(
       });
     },
 
-    signMessage: (message: string | Uint8Array): Promise<Uint8Array> => {
-      return messenger.sendDomMessage<Uint8Array>(
+    signMessage: async (message: string | Uint8Array): Promise<Uint8Array> => {
+      const signatureBase64url = await messenger.sendDomMessage<string>(
         "popup",
         "signer:signMessage",
         {
@@ -48,6 +48,7 @@ export function getSigner(
           message,
         }
       );
+      return utils.decodeBase64url(signatureBase64url);
     },
 
     prepareTransaction: async (
