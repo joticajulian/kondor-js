@@ -1,4 +1,3 @@
-import { Messenger } from "./Messenger";
 import {
   BlockJson,
   CallContractOperationJson,
@@ -6,6 +5,8 @@ import {
   TransactionJsonWait,
   TransactionReceipt,
 } from "koilib/lib/interface";
+import { Messenger } from "./Messenger";
+import { kondorVersion } from "./constants";
 
 const messenger = new Messenger({});
 
@@ -16,6 +17,7 @@ export function getProvider(network?: string) {
         network,
         method,
         params,
+        kondorVersion,
       });
     },
 
@@ -23,6 +25,7 @@ export function getProvider(network?: string) {
       return messenger.sendDomMessage("background", "provider:getNonce", {
         network,
         account,
+        kondorVersion,
       });
     },
 
@@ -30,6 +33,7 @@ export function getProvider(network?: string) {
       return messenger.sendDomMessage("background", "provider:getAccountRc", {
         network,
         account,
+        kondorVersion,
       });
     },
 
@@ -45,6 +49,7 @@ export function getProvider(network?: string) {
         {
           network,
           transactionIds,
+          kondorVersion,
         }
       );
     },
@@ -59,6 +64,7 @@ export function getProvider(network?: string) {
       return messenger.sendDomMessage("background", "provider:getBlocksById", {
         network,
         blockIds,
+        kondorVersion,
       });
     },
 
@@ -72,12 +78,14 @@ export function getProvider(network?: string) {
     }> {
       return messenger.sendDomMessage("background", "provider:getHeadInfo", {
         network,
+        kondorVersion,
       });
     },
 
     async getChainId(): Promise<string> {
       return messenger.sendDomMessage("background", "provider:getChainId", {
         network,
+        kondorVersion,
       });
     },
 
@@ -100,6 +108,7 @@ export function getProvider(network?: string) {
         height,
         numBlocks,
         idRef,
+        kondorVersion,
       });
     },
 
@@ -114,6 +123,7 @@ export function getProvider(network?: string) {
       return messenger.sendDomMessage("background", "provider:getBlock", {
         network,
         height,
+        kondorVersion,
       });
     },
 
@@ -127,6 +137,7 @@ export function getProvider(network?: string) {
         txId,
         type,
         timeout,
+        kondorVersion,
       });
     },
 
@@ -144,25 +155,35 @@ export function getProvider(network?: string) {
         network,
         transaction,
         broadcast,
+        kondorVersion,
       });
-      response.transaction.wait = async (
+      transaction.id = response.transaction.id;
+      transaction.header = response.transaction.header;
+      transaction.operations = response.transaction.operations;
+      transaction.signatures = response.transaction.signatures;
+      (transaction as TransactionJsonWait).wait = async (
         type: "byTransactionId" | "byBlock" = "byBlock",
         timeout = 60000
       ) => {
         return messenger.sendDomMessage("background", "provider:wait", {
           network,
-          txId: response.transaction.id,
+          txId: transaction.id,
           type,
           timeout,
+          kondorVersion,
         });
       };
-      return response;
+      return {
+        transaction: transaction as TransactionJsonWait,
+        receipt: response.receipt,
+      };
     },
 
     async submitBlock(block: BlockJson): Promise<Record<string, never>> {
       return messenger.sendDomMessage("background", "provider:submitBlock", {
         network,
         block,
+        kondorVersion,
       });
     },
 
@@ -173,6 +194,7 @@ export function getProvider(network?: string) {
       return messenger.sendDomMessage("background", "provider:readContract", {
         network,
         operation,
+        kondorVersion,
       });
     },
   };

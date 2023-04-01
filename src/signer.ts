@@ -1,5 +1,4 @@
 import { SignerInterface, Provider, Signer, utils } from "koilib";
-import { Messenger } from "./Messenger";
 import {
   BlockJson,
   SendTransactionOptions,
@@ -7,6 +6,8 @@ import {
   TransactionJsonWait,
   TransactionReceipt,
 } from "koilib/lib/interface";
+import { Messenger } from "./Messenger";
+import { kondorVersion } from "./constants";
 
 const messenger = new Messenger({});
 
@@ -36,6 +37,7 @@ export function getSigner(
       return messenger.sendDomMessage<Uint8Array>("popup", "signer:signHash", {
         signerAddress,
         hash,
+        kondorVersion,
       });
     },
 
@@ -46,6 +48,7 @@ export function getSigner(
         {
           signerAddress,
           message,
+          kondorVersion,
         }
       );
       return utils.decodeBase64url(signatureBase64url);
@@ -72,7 +75,7 @@ export function getSigner(
       const tx = await messenger.sendDomMessage<TransactionJson>(
         "background",
         "signer:prepareTransaction",
-        { network, signerAddress, transaction }
+        { network, signerAddress, transaction, kondorVersion }
       );
       transaction.id = tx.id;
       transaction.header = tx.header;
@@ -90,14 +93,18 @@ export function getSigner(
           signerAddress,
           transaction,
           abis,
+          kondorVersion,
         }
       );
+      transaction.id = tx.id;
+      transaction.header = tx.header;
+      transaction.operations = tx.operations;
       transaction.signatures = tx.signatures;
       return transaction;
     },
 
     sendTransaction: async (
-      tx: TransactionJson,
+      transaction: TransactionJson,
       optsSend?: SendTransactionOptions
     ): Promise<{
       receipt: TransactionReceipt;
@@ -111,20 +118,29 @@ export function getSigner(
         transaction: TransactionJsonWait;
       }>("popup", "signer:sendTransaction", {
         signerAddress,
-        transaction: tx,
+        transaction,
         optsSend,
+        kondorVersion,
       });
-      response.transaction.wait = async (
+      transaction.id = response.transaction.id;
+      transaction.header = response.transaction.header;
+      transaction.operations = response.transaction.operations;
+      transaction.signatures = response.transaction.signatures;
+      (transaction as TransactionJsonWait).wait = async (
         type: "byTransactionId" | "byBlock" = "byBlock",
         timeout = 60000
       ) => {
         return messenger.sendDomMessage("background", "provider:wait", {
-          txId: response.transaction.id,
+          txId: transaction.id,
           type,
           timeout,
+          kondorVersion,
         });
       };
-      return response;
+      return {
+        transaction: transaction as TransactionJsonWait,
+        receipt: response.receipt,
+      };
     },
 
     prepareBlock: (): Promise<BlockJson> => {
