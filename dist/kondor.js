@@ -19960,12 +19960,45 @@ exports.Messenger = Messenger;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getAccounts = void 0;
 const Messenger_1 = __webpack_require__(6698);
+const constants_1 = __webpack_require__(5601);
 const messenger = new Messenger_1.Messenger();
 async function getAccounts() {
-    return messenger.sendDomMessage("popup", "getAccounts", {});
+    return messenger.sendDomMessage("popup", "getAccounts", { kondorVersion: constants_1.kondorVersion });
 }
 exports.getAccounts = getAccounts;
 exports["default"] = getAccounts;
+
+
+/***/ }),
+
+/***/ 5601:
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.kondorVersion = void 0;
+const packageJson = __importStar(__webpack_require__(4147));
+exports.kondorVersion = packageJson.version;
 
 
 /***/ }),
@@ -19976,86 +20009,128 @@ exports["default"] = getAccounts;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.provider = void 0;
+exports.provider = exports.getProvider = void 0;
 const Messenger_1 = __webpack_require__(6698);
+const constants_1 = __webpack_require__(5601);
 const messenger = new Messenger_1.Messenger({});
-exports.provider = {
-    async call(method, params) {
-        return messenger.sendDomMessage("background", "provider:call", {
-            method,
-            params,
-        });
-    },
-    async getNonce(account) {
-        return messenger.sendDomMessage("background", "provider:getNonce", {
-            account,
-        });
-    },
-    async getAccountRc(account) {
-        return messenger.sendDomMessage("background", "provider:getAccountRc", {
-            account,
-        });
-    },
-    async getTransactionsById(transactionIds) {
-        return messenger.sendDomMessage("background", "provider:getTransactionsById", {
-            transactionIds,
-        });
-    },
-    async getBlocksById(blockIds) {
-        return messenger.sendDomMessage("background", "provider:getBlocksById", {
-            blockIds,
-        });
-    },
-    async getHeadInfo() {
-        return messenger.sendDomMessage("background", "provider:getHeadInfo");
-    },
-    async getChainId() {
-        return messenger.sendDomMessage("background", "provider:getChainId");
-    },
-    async getBlocks(height, numBlocks = 1, idRef) {
-        return messenger.sendDomMessage("background", "provider:getBlocks", {
-            height,
-            numBlocks,
-            idRef,
-        });
-    },
-    async getBlock(height) {
-        return messenger.sendDomMessage("background", "provider:getBlock", {
-            height,
-        });
-    },
-    async wait(txId, type = "byBlock", timeout = 30000) {
-        return messenger.sendDomMessage("background", "provider:wait", {
-            txId,
-            type,
-            timeout,
-        });
-    },
-    async sendTransaction(transaction, broadcast = true) {
-        const response = await messenger.sendDomMessage("background", "provider:sendTransaction", {
-            transaction,
-            broadcast,
-        });
-        response.transaction.wait = async (type = "byBlock", timeout = 60000) => {
+function getProvider(network) {
+    return {
+        async call(method, params) {
+            return messenger.sendDomMessage("background", "provider:call", {
+                network,
+                method,
+                params,
+                kondorVersion: constants_1.kondorVersion,
+            });
+        },
+        async getNonce(account) {
+            return messenger.sendDomMessage("background", "provider:getNonce", {
+                network,
+                account,
+                kondorVersion: constants_1.kondorVersion,
+            });
+        },
+        async getAccountRc(account) {
+            return messenger.sendDomMessage("background", "provider:getAccountRc", {
+                network,
+                account,
+                kondorVersion: constants_1.kondorVersion,
+            });
+        },
+        async getTransactionsById(transactionIds) {
+            return messenger.sendDomMessage("background", "provider:getTransactionsById", {
+                network,
+                transactionIds,
+                kondorVersion: constants_1.kondorVersion,
+            });
+        },
+        async getBlocksById(blockIds) {
+            return messenger.sendDomMessage("background", "provider:getBlocksById", {
+                network,
+                blockIds,
+                kondorVersion: constants_1.kondorVersion,
+            });
+        },
+        async getHeadInfo() {
+            return messenger.sendDomMessage("background", "provider:getHeadInfo", {
+                network,
+                kondorVersion: constants_1.kondorVersion,
+            });
+        },
+        async getChainId() {
+            return messenger.sendDomMessage("background", "provider:getChainId", {
+                network,
+                kondorVersion: constants_1.kondorVersion,
+            });
+        },
+        async getBlocks(height, numBlocks = 1, idRef) {
+            return messenger.sendDomMessage("background", "provider:getBlocks", {
+                network,
+                height,
+                numBlocks,
+                idRef,
+                kondorVersion: constants_1.kondorVersion,
+            });
+        },
+        async getBlock(height) {
+            return messenger.sendDomMessage("background", "provider:getBlock", {
+                network,
+                height,
+                kondorVersion: constants_1.kondorVersion,
+            });
+        },
+        async wait(txId, type = "byBlock", timeout = 30000) {
             return messenger.sendDomMessage("background", "provider:wait", {
-                txId: response.transaction.id,
+                network,
+                txId,
                 type,
                 timeout,
+                kondorVersion: constants_1.kondorVersion,
             });
-        };
-        return response;
-    },
-    async submitBlock(block) {
-        return messenger.sendDomMessage("background", "provider:submitBlock", {
-            block,
-        });
-    },
-    async readContract(operation) {
-        return messenger.sendDomMessage("background", "provider:readContract", {
-            operation,
-        });
-    },
-};
+        },
+        async sendTransaction(transaction, broadcast = true) {
+            const response = await messenger.sendDomMessage("background", "provider:sendTransaction", {
+                network,
+                transaction,
+                broadcast,
+                kondorVersion: constants_1.kondorVersion,
+            });
+            transaction.id = response.transaction.id;
+            transaction.header = response.transaction.header;
+            transaction.operations = response.transaction.operations;
+            transaction.signatures = response.transaction.signatures;
+            transaction.wait = async (type = "byBlock", timeout = 60000) => {
+                return messenger.sendDomMessage("background", "provider:wait", {
+                    network,
+                    txId: transaction.id,
+                    type,
+                    timeout,
+                    kondorVersion: constants_1.kondorVersion,
+                });
+            };
+            return {
+                transaction: transaction,
+                receipt: response.receipt,
+            };
+        },
+        async submitBlock(block) {
+            return messenger.sendDomMessage("background", "provider:submitBlock", {
+                network,
+                block,
+                kondorVersion: constants_1.kondorVersion,
+            });
+        },
+        async readContract(operation) {
+            return messenger.sendDomMessage("background", "provider:readContract", {
+                network,
+                operation,
+                kondorVersion: constants_1.kondorVersion,
+            });
+        },
+    };
+}
+exports.getProvider = getProvider;
+exports.provider = getProvider();
 exports["default"] = exports.provider;
 
 
@@ -20070,6 +20145,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getSigner = void 0;
 const koilib_1 = __webpack_require__(7806);
 const Messenger_1 = __webpack_require__(6698);
+const constants_1 = __webpack_require__(5601);
 const messenger = new Messenger_1.Messenger({});
 function getSigner(signerAddress, options) {
     return {
@@ -20081,13 +20157,16 @@ function getSigner(signerAddress, options) {
             return messenger.sendDomMessage("popup", "signer:signHash", {
                 signerAddress,
                 hash,
+                kondorVersion: constants_1.kondorVersion,
             });
         },
-        signMessage: (message) => {
-            return messenger.sendDomMessage("popup", "signer:signMessage", {
+        signMessage: async (message) => {
+            const signatureBase64url = await messenger.sendDomMessage("popup", "signer:signMessage", {
                 signerAddress,
                 message,
+                kondorVersion: constants_1.kondorVersion,
             });
+            return koilib_1.utils.decodeBase64url(signatureBase64url);
         },
         prepareTransaction: async (transaction) => {
             if (options && options.providerPrepareTransaction) {
@@ -20101,7 +20180,8 @@ function getSigner(signerAddress, options) {
                 }
                 return signer.prepareTransaction(transaction);
             }
-            const tx = await messenger.sendDomMessage("background", "signer:prepareTransaction", { signerAddress, transaction });
+            const network = options ? options.network : "";
+            const tx = await messenger.sendDomMessage("background", "signer:prepareTransaction", { network, signerAddress, transaction, kondorVersion: constants_1.kondorVersion });
             transaction.id = tx.id;
             transaction.header = tx.header;
             return transaction;
@@ -20111,27 +20191,40 @@ function getSigner(signerAddress, options) {
                 signerAddress,
                 transaction,
                 abis,
+                kondorVersion: constants_1.kondorVersion,
             });
+            transaction.id = tx.id;
+            transaction.header = tx.header;
+            transaction.operations = tx.operations;
             transaction.signatures = tx.signatures;
             return transaction;
         },
-        sendTransaction: async (tx, optsSend) => {
+        sendTransaction: async (transaction, optsSend) => {
             if (optsSend === null || optsSend === void 0 ? void 0 : optsSend.beforeSend) {
                 throw new Error("beforeSend option is not supported in kondor");
             }
             const response = await messenger.sendDomMessage("popup", "signer:sendTransaction", {
                 signerAddress,
-                transaction: tx,
+                transaction,
                 optsSend,
+                kondorVersion: constants_1.kondorVersion,
             });
-            response.transaction.wait = async (type = "byBlock", timeout = 60000) => {
+            transaction.id = response.transaction.id;
+            transaction.header = response.transaction.header;
+            transaction.operations = response.transaction.operations;
+            transaction.signatures = response.transaction.signatures;
+            transaction.wait = async (type = "byBlock", timeout = 60000) => {
                 return messenger.sendDomMessage("background", "provider:wait", {
-                    txId: response.transaction.id,
+                    txId: transaction.id,
                     type,
                     timeout,
+                    kondorVersion: constants_1.kondorVersion,
                 });
             };
-            return response;
+            return {
+                transaction: transaction,
+                receipt: response.receipt,
+            };
         },
         prepareBlock: () => {
             throw new Error("prepareBlock is not available");
@@ -20167,6 +20260,14 @@ module.exports = JSON.parse('{"nested":{"koinos":{"options":{"go_package":"githu
 
 "use strict";
 module.exports = JSON.parse('{"nested":{"koinos":{"nested":{"contracts":{"nested":{"token":{"options":{"go_package":"github.com/koinos/koinos-proto-golang/koinos/contracts/token"},"nested":{"name_arguments":{"fields":{}},"name_result":{"fields":{"value":{"type":"string","id":1}}},"symbol_arguments":{"fields":{}},"symbol_result":{"fields":{"value":{"type":"string","id":1}}},"decimals_arguments":{"fields":{}},"decimals_result":{"fields":{"value":{"type":"uint32","id":1}}},"total_supply_arguments":{"fields":{}},"total_supply_result":{"fields":{"value":{"type":"uint64","id":1,"options":{"jstype":"JS_STRING"}}}},"balance_of_arguments":{"fields":{"owner":{"type":"bytes","id":1,"options":{"(btype)":"ADDRESS"}}}},"balance_of_result":{"fields":{"value":{"type":"uint64","id":1,"options":{"jstype":"JS_STRING"}}}},"transfer_arguments":{"fields":{"from":{"type":"bytes","id":1,"options":{"(btype)":"ADDRESS"}},"to":{"type":"bytes","id":2,"options":{"(btype)":"ADDRESS"}},"value":{"type":"uint64","id":3,"options":{"jstype":"JS_STRING"}}}},"transfer_result":{"fields":{}},"mint_arguments":{"fields":{"to":{"type":"bytes","id":1,"options":{"(btype)":"ADDRESS"}},"value":{"type":"uint64","id":2,"options":{"jstype":"JS_STRING"}}}},"mint_result":{"fields":{}},"burn_arguments":{"fields":{"from":{"type":"bytes","id":1,"options":{"(btype)":"ADDRESS"}},"value":{"type":"uint64","id":2,"options":{"jstype":"JS_STRING"}}}},"burn_result":{"fields":{}},"balance_object":{"fields":{"value":{"type":"uint64","id":1,"options":{"jstype":"JS_STRING"}}}},"mana_balance_object":{"fields":{"balance":{"type":"uint64","id":1,"options":{"jstype":"JS_STRING"}},"mana":{"type":"uint64","id":2,"options":{"jstype":"JS_STRING"}},"last_mana_update":{"type":"uint64","id":3,"options":{"jstype":"JS_STRING"}}}},"burn_event":{"fields":{"from":{"type":"bytes","id":1,"options":{"(btype)":"ADDRESS"}},"value":{"type":"uint64","id":2,"options":{"jstype":"JS_STRING"}}}},"mint_event":{"fields":{"to":{"type":"bytes","id":1,"options":{"(btype)":"ADDRESS"}},"value":{"type":"uint64","id":2,"options":{"jstype":"JS_STRING"}}}},"transfer_event":{"fields":{"from":{"type":"bytes","id":1,"options":{"(btype)":"ADDRESS"}},"to":{"type":"bytes","id":2,"options":{"(btype)":"ADDRESS"}},"value":{"type":"uint64","id":3,"options":{"jstype":"JS_STRING"}}}}}}}}}}}}');
+
+/***/ }),
+
+/***/ 4147:
+/***/ ((module) => {
+
+"use strict";
+module.exports = JSON.parse('{"name":"kondor-js","version":"0.4.0","description":"Kondor Library","author":"Julian Gonzalez","repository":{"url":"https://github.com/joticajulian/kondor-js.git"},"homepage":"https://github.com/joticajulian/kondor-js.git","bugs":{"url":"https://github.com/joticajulian/kondor-js/issues"},"files":["lib","dist"],"main":"./lib/browser/index.js","types":"./lib/browser/index.d.ts","browser":"./lib/browser/index.js","scripts":{"build":"rimraf lib/browser && tsc -p tsconfig.browser.json","bundle":"yarn bundle:no-min && yarn bundle:min && yarn testfiles","bundle:min":"webpack --mode=production --config webpack.prod.config.js","bundle:no-min":"webpack --mode=production --config webpack.dev.config.js","lint":"yarn lint:prettier && yarn lint:eslint && yarn lint:tsc","lint:prettier":"prettier . --check","lint:eslint":"eslint . --ext .js,.ts","lint:tsc":"tsc --noEmit --incremental false","prerelease":"yarn bundle && yarn build","serve":"node test/server.js","testfiles":"copyfiles -u 3 node_modules/koilib/dist/koinos.min.js test/js && copyfiles -u 1 dist/kondor.min.js test/js"},"exports":{"./package.json":"./package.json",".":"./lib/browser/index.js"},"dependencies":{"koilib":"^5.2.0"},"devDependencies":{"@tsconfig/node12":"^1.0.11","@types/chrome":"^0.0.195","@typescript-eslint/eslint-plugin":"^5.35.1","@typescript-eslint/parser":"^5.35.1","copyfiles":"^2.4.1","eslint":"^8.22.0","eslint-config-airbnb-typescript":"^17.0.0","eslint-config-prettier":"^8.3.0","eslint-plugin-import":"^2.25.4","eslint-plugin-prettier":"^4.2.1","eslint-plugin-tsdoc":"^0.2.16","fastify":"^3.26.0","fastify-static":"^4.5.0","prettier":"^2.7.1","rimraf":"^3.0.2","ts-loader":"~8.2.0","typescript":"4.5.4","webpack":"^5.74.0","webpack-cli":"^4.10.0"}}');
 
 /***/ })
 
@@ -20222,7 +20323,7 @@ __webpack_unused_export__ = ({ value: true });
 const provider_1 = __webpack_require__(4599);
 const signer_1 = __webpack_require__(942);
 const account_1 = __webpack_require__(1339);
-window.kondor = { provider: provider_1.provider, getSigner: signer_1.getSigner, getAccounts: account_1.getAccounts };
+window.kondor = { provider: provider_1.provider, getProvider: provider_1.getProvider, getSigner: signer_1.getSigner, getAccounts: account_1.getAccounts };
 
 })();
 
