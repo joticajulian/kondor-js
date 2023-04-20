@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v0.4.1](https://github.com/joticajulian/kondor-js/releases/tag/v0.4.1) (2023-04-21)
+
+### 🐛 Bug Fixes
+
+- fix package.json
+
+
 ## [v0.4.0](https://github.com/joticajulian/kondor-js/releases/tag/v0.4.0) (2023-04-02)
 
 ### 🚀 Features
