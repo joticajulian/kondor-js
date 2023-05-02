@@ -131,6 +131,7 @@ export function getSigner(
         timeout = 60000
       ) => {
         return messenger.sendDomMessage("background", "provider:wait", {
+          network: options ? options.network : "",
           txId: transaction.id,
           type,
           timeout,
