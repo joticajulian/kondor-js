@@ -4,7 +4,7 @@ import {
   TransactionJson,
   TransactionJsonWait,
   TransactionReceipt,
-} from "koilib/lib/interface";
+} from "koilib";
 import { Messenger } from "./Messenger";
 import { kondorVersion } from "./constants";
 

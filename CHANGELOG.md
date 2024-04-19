@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v1.0.0](https://github.com/joticajulian/kondor-js/releases/tag/v1.0.0) (2024-04-19)
+
+### 🚀 Features
+
+- Using koilib v6
+- prepareTransaction was removed from the signer to be aligned with koilib v6
+
 ## [v0.4.2](https://github.com/joticajulian/kondor-js/releases/tag/v0.4.2) (2023-05-02)
 
 ### 🐛 Bug Fixes
