@@ -1,4 +1,4 @@
-import { SignerInterface, Provider, Signer, utils } from "koilib";
+import { SignerInterface, Provider, utils } from "koilib";
 import {
   BlockJson,
   SendTransactionOptions,
@@ -29,10 +29,6 @@ export function getSigner(
   return {
     getAddress: () => signerAddress,
 
-    getPrivateKey: (): string => {
-      throw new Error("getPrivateKey is not available");
-    },
-
     signHash: (hash: Uint8Array): Promise<Uint8Array> => {
       return messenger.sendDomMessage<Uint8Array>("popup", "signer:signHash", {
         signerAddress,
@@ -52,34 +48,6 @@ export function getSigner(
         }
       );
       return utils.decodeBase64url(signatureBase64url);
-    },
-
-    prepareTransaction: async (
-      transaction: TransactionJson
-    ): Promise<TransactionJson> => {
-      if (options && options.providerPrepareTransaction) {
-        const signer = Signer.fromSeed("seed");
-        signer.provider = options.providerPrepareTransaction;
-        if (!transaction.header) {
-          transaction.header = { payer: signerAddress };
-        }
-
-        if (!transaction.header.payer) {
-          transaction.header.payer = signerAddress;
-        }
-        return signer.prepareTransaction(transaction);
-      }
-
-      const network = options ? options.network : "";
-
-      const tx = await messenger.sendDomMessage<TransactionJson>(
-        "background",
-        "signer:prepareTransaction",
-        { network, signerAddress, transaction, kondorVersion }
-      );
-      transaction.id = tx.id;
-      transaction.header = tx.header;
-      return transaction;
     },
 
     signTransaction: async (
