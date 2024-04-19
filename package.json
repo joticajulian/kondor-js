@@ -36,7 +36,7 @@
     ".": "./lib/browser/src/index.js"
   },
   "dependencies": {
-    "koilib": "^5.6.1"
+    "koilib": "^6.0.0"
   },
   "devDependencies": {
     "@tsconfig/node12": "^1.0.11",

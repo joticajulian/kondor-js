@@ -1804,10 +1804,10 @@ kind-of@^6.0.2:
   resolved "https://registry.npmjs.org/kind-of/-/kind-of-6.0.3.tgz"
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
 
-koilib@^5.6.1:
-  version "5.6.1"
-  resolved "https://registry.yarnpkg.com/koilib/-/koilib-5.6.1.tgz#72f61455959ce00c23ec19d99467cb75e999985b"
-  integrity sha512-Ulon6gOYIVf11XzQ18BwY/p6VHdQ3JyIgqgZ/RsATg/VuUUvWoZ8w4nPNBBMohPhXh5lmu/O1E/wQ8BGxfpEvg==
+koilib@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/koilib/-/koilib-6.0.0.tgz#9d4c76f29490ca38b5024e847c5947909e60777b"
+  integrity sha512-AMb1HRE4jzqhzyxqMKLaN2j+Da+tXVRSV03fKcPiTpHwGQsnZ5/CSaBuTNhYIq41ghcrcpDkusWMvI1jXtVmeg==
   dependencies:
     "@noble/hashes" "^1.3.1"
     "@noble/secp256k1" "^1.7.1"
