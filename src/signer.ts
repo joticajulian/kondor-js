@@ -26,6 +26,8 @@ export function getSigner(
     network?: string;
   }
 ): SignerInterface {
+  if (!signerAddress) throw new Error("no signerAddress defined");
+
   return {
     getAddress: () => signerAddress,
 
