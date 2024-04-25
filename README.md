@@ -39,7 +39,7 @@ You can also load it directly to the browser by downloading the bunble file loca
         const koinContract = new Contract({
           id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
           abi: utils.tokenAbi,
-          provider: kondor.provider,
+          provider: kondor.getProvider("harbinger"),
           signer: kondor.getSigner(userAddress),
         });
         const koin = koinContract.functions;
@@ -71,7 +71,7 @@ import { Contract, utils } from "koilib";
   const koinContract = new Contract({
     id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
     abi: utils.tokenAbi,
-    provider: kondor.provider,
+    provider: kondor.getProvider("harbinger"),
     signer: kondor.getSigner(userAddress),
   });
   const koin = koinContract.functions;

@@ -1,7 +1,5 @@
-import {
-  BlockJson,
-  CallContractOperationJson,
-  TransactionJson,
+import type {
+  Provider,
   TransactionJsonWait,
   TransactionReceipt,
 } from "koilib";
@@ -10,9 +8,12 @@ import { kondorVersion } from "./constants";
 
 const messenger = new Messenger({});
 
-export function getProvider(network?: string) {
+export function getProvider(network?: string): Provider {
   return {
-    async call<T = unknown>(method: string, params: unknown): Promise<T> {
+    rpcNodes: [],
+    onError: () => true,
+    currentNodeId: 0,
+    async call(method, params) {
       return messenger.sendDomMessage("background", "provider:call", {
         network,
         method,
@@ -21,7 +22,7 @@ export function getProvider(network?: string) {
       });
     },
 
-    async getNonce(account: string): Promise<number> {
+    async getNonce(account) {
       return messenger.sendDomMessage("background", "provider:getNonce", {
         network,
         account,
@@ -29,7 +30,15 @@ export function getProvider(network?: string) {
       });
     },
 
-    async getAccountRc(account: string): Promise<string> {
+    async getNextNonce(account) {
+      return messenger.sendDomMessage("background", "provider:getNextNonce", {
+        network,
+        account,
+        kondorVersion,
+      });
+    },
+
+    async getAccountRc(account) {
       return messenger.sendDomMessage("background", "provider:getAccountRc", {
         network,
         account,
@@ -37,12 +46,7 @@ export function getProvider(network?: string) {
       });
     },
 
-    async getTransactionsById(transactionIds: string[]): Promise<{
-      transactions: {
-        transaction: TransactionJson[];
-        containing_blocks: string[];
-      }[];
-    }> {
+    async getTransactionsById(transactionIds) {
       return messenger.sendDomMessage(
         "background",
         "provider:getTransactionsById",
@@ -54,84 +58,50 @@ export function getProvider(network?: string) {
       );
     },
 
-    async getBlocksById(blockIds: string[]): Promise<{
-      block_items: {
-        block_id: string;
-        block_height: string;
-        block: BlockJson;
-      }[];
-    }> {
+    async getBlocksById(blockIds, opts) {
       return messenger.sendDomMessage("background", "provider:getBlocksById", {
         network,
         blockIds,
+        opts,
         kondorVersion,
       });
     },
 
-    async getHeadInfo(): Promise<{
-      head_topology: {
-        id: string;
-        height: string;
-        previous: string;
-      };
-      last_irreversible_block: string;
-    }> {
+    async getHeadInfo() {
       return messenger.sendDomMessage("background", "provider:getHeadInfo", {
         network,
         kondorVersion,
       });
     },
 
-    async getChainId(): Promise<string> {
+    async getChainId() {
       return messenger.sendDomMessage("background", "provider:getChainId", {
         network,
         kondorVersion,
       });
     },
 
-    async getBlocks(
-      height: number,
-      numBlocks = 1,
-      idRef?: string
-    ): Promise<
-      {
-        block_id: string;
-        block_height: string;
-        block: BlockJson;
-        block_receipt: {
-          [x: string]: unknown;
-        };
-      }[]
-    > {
+    async getBlocks(height, numBlocks, idRef, opts) {
       return messenger.sendDomMessage("background", "provider:getBlocks", {
         network,
         height,
         numBlocks,
         idRef,
+        opts,
         kondorVersion,
       });
     },
 
-    async getBlock(height: number): Promise<{
-      block_id: string;
-      block_height: string;
-      block: BlockJson;
-      block_receipt: {
-        [x: string]: unknown;
-      };
-    }> {
+    getBlock(height, opts) {
       return messenger.sendDomMessage("background", "provider:getBlock", {
         network,
         height,
+        opts,
         kondorVersion,
       });
     },
 
-    async wait(
-      txId: string,
-      type: "byTransactionId" | "byBlock" = "byBlock",
-      timeout = 30000
-    ): Promise<string | number> {
+    async wait(txId, type, timeout) {
       return messenger.sendDomMessage("background", "provider:wait", {
         network,
         txId,
@@ -141,13 +111,7 @@ export function getProvider(network?: string) {
       });
     },
 
-    async sendTransaction(
-      transaction: TransactionJson,
-      broadcast = true
-    ): Promise<{
-      receipt: TransactionReceipt;
-      transaction: TransactionJsonWait;
-    }> {
+    async sendTransaction(transaction, broadcast) {
       const response = await messenger.sendDomMessage<{
         receipt: TransactionReceipt;
         transaction: TransactionJsonWait;
@@ -179,7 +143,7 @@ export function getProvider(network?: string) {
       };
     },
 
-    async submitBlock(block: BlockJson): Promise<Record<string, never>> {
+    async submitBlock(block) {
       return messenger.sendDomMessage("background", "provider:submitBlock", {
         network,
         block,
@@ -187,15 +151,57 @@ export function getProvider(network?: string) {
       });
     },
 
-    async readContract(operation: CallContractOperationJson): Promise<{
-      result: string;
-      logs: string;
-    }> {
+    async readContract(operation) {
       return messenger.sendDomMessage("background", "provider:readContract", {
         network,
         operation,
         kondorVersion,
       });
+    },
+
+    async getForkHeads() {
+      return messenger.sendDomMessage("background", "provider:getForkHeads", {
+        network,
+        kondorVersion,
+      });
+    },
+
+    async getResourceLimits() {
+      return messenger.sendDomMessage(
+        "background",
+        "provider:getResourceLimits",
+        {
+          network,
+          kondorVersion,
+        }
+      );
+    },
+
+    async invokeSystemCall(serializer, nameOrId, args, callerData) {
+      return messenger.sendDomMessage(
+        "background",
+        "provider:invokeSystemCall",
+        {
+          network,
+          serializer,
+          nameOrId,
+          args,
+          callerData,
+          kondorVersion,
+        }
+      );
+    },
+
+    async invokeGetContractMetadata(contractId) {
+      return messenger.sendDomMessage(
+        "background",
+        "provider:getResourceLimits",
+        {
+          network,
+          contractId,
+          kondorVersion,
+        }
+      );
     },
   };
 }

@@ -1,5 +1,6 @@
-import { SignerInterface, Provider, utils } from "koilib";
-import {
+import type {
+  SignerInterface,
+  Provider,
   BlockJson,
   SendTransactionOptions,
   TransactionJson,
@@ -8,6 +9,7 @@ import {
 } from "koilib";
 import { Messenger } from "./Messenger";
 import { kondorVersion } from "./constants";
+import { decodeBase64url } from "./utils";
 
 const messenger = new Messenger({});
 
@@ -49,7 +51,7 @@ export function getSigner(
           kondorVersion,
         }
       );
-      return utils.decodeBase64url(signatureBase64url);
+      return decodeBase64url(signatureBase64url);
     },
 
     signTransaction: async (
