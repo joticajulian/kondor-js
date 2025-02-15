@@ -52,7 +52,7 @@
     "eslint-plugin-tsdoc": "^0.2.16",
     "fastify": "^3.26.0",
     "fastify-static": "^4.5.0",
-    "koilib": "^7.0.0",
+    "koilib": "^9.1.0",
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
     "ts-loader": "~8.2.0",

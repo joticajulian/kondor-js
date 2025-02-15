@@ -37,7 +37,7 @@ You can also load it directly to the browser by downloading the bunble file loca
         const userAddress = accounts[0].address;
 
         const koinContract = new Contract({
-          id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+          id: "1EdLyQ67LW6HVU1dWoceP4firtyz77e37Y",
           abi: utils.tokenAbi,
           provider: kondor.getProvider("harbinger"),
           signer: kondor.getSigner(userAddress),
@@ -69,7 +69,7 @@ import { Contract, utils } from "koilib";
   const userAddress = accounts[0].address;
 
   const koinContract = new Contract({
-    id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+    id: "1EdLyQ67LW6HVU1dWoceP4firtyz77e37Y",
     abi: utils.tokenAbi,
     provider: kondor.getProvider("harbinger"),
     signer: kondor.getSigner(userAddress),
@@ -84,25 +84,39 @@ import { Contract, utils } from "koilib";
 })();
 ```
 
-### Known issues
+### KondorSigner
 
-In some cases Kondor triggers 2 popups. In particular when transaction options like `chainId`, `rcLimit`, and `nonce` are defined beforehand and then Kondor doesn't have to calculate them.
+You can also import the `KoinosSigner`:
 
-If this happens to you then define the signer in this way:
+```ts
+import { KondorSigner } from "kondor-js";
+import { Contract, utils } from "koilib";
 
+(async () => {
+  const accounts = await kondor.getAccounts();
+  const userAddress = accounts[0].address;
+
+  const provider = new Provider("https://api.koinos.io");
+  const signer = new KoinosSigner({
+    address: userAddress,
+    provider,
+  });
+
+  const koinContract = new Contract({
+    id: "1EdLyQ67LW6HVU1dWoceP4firtyz77e37Y",
+    abi: utils.tokenAbi,
+    provider,
+    signer,
+  });
+  const koin = koinContract.functions;
+
+  // Get balance
+  const { result } = await koin.balanceOf({
+    owner: userAddress,
+  });
+  console.log(balance.result);
+})();
 ```
-const provider = new Provider(["https://api.koinos.io"]);
-const userAddress = "1K6oESWG87m3cB3M2WVkzxdTr38po8WToN";
-const signer = kondor.getSigner(userAddress, {
-  providerPrepareTransaction: provider,
-});
-```
-
-With this definition, kondor will use `providerPrepareTransaction` in the preparation of the transaction instead of calling the kondor extension. This solves the race condition with double popups.
-
-Take into account that if you use this code but the `chainId`, `rcLimit`, or `nonce` are not defined, then it's normal to see a delay between the click and the popup (because they are called using the provider before triggering the popup). In conclusion, define the 3 values when using `providerPrepareTransaction` to not experiment delays.
-
-Note: This is a temporary solution while the race condition with double popups is fixed.
 
 ## Test
 

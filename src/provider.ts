@@ -1,5 +1,5 @@
 import type {
-  Provider,
+  ProviderInterface,
   TransactionJsonWait,
   TransactionReceipt,
 } from "koilib";
@@ -8,11 +8,8 @@ import { kondorVersion } from "./constants";
 
 const messenger = new Messenger({});
 
-export function getProvider(network?: string): Provider {
+export function getProvider(network?: string): ProviderInterface {
   return {
-    rpcNodes: [],
-    onError: () => true,
-    currentNodeId: 0,
     async call(method, params) {
       return messenger.sendDomMessage("background", "provider:call", {
         network,
