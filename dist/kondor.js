@@ -918,9 +918,6 @@ const constants_1 = __webpack_require__(601);
 const messenger = new Messenger_1.Messenger({});
 function getProvider(network) {
     return {
-        rpcNodes: [],
-        onError: () => true,
-        currentNodeId: 0,
         async call(method, params) {
             return messenger.sendDomMessage("background", "provider:call", {
                 network,
@@ -1086,82 +1083,99 @@ exports["default"] = exports.provider;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getSigner = void 0;
+exports.getSigner = exports.KondorSigner = void 0;
 const Messenger_1 = __webpack_require__(698);
 const constants_1 = __webpack_require__(601);
 const utils_1 = __webpack_require__(593);
 const messenger = new Messenger_1.Messenger({});
+class KondorSigner {
+    constructor(c) {
+        this.provider = c.provider;
+        this.address = c.address;
+        this.sendOptions = {
+            broadcast: true,
+            ...c.sendOptions,
+        };
+    }
+    getAddress() {
+        return this.address;
+    }
+    signHash(hash) {
+        return messenger.sendDomMessage("popup", "signer:signHash", {
+            signerAddress: this.address,
+            hash,
+            kondorVersion: constants_1.kondorVersion,
+        });
+    }
+    async signMessage(message) {
+        const signatureBase64url = await messenger.sendDomMessage("popup", "signer:signMessage", {
+            signerAddress: this.address,
+            message,
+            kondorVersion: constants_1.kondorVersion,
+        });
+        return (0, utils_1.decodeBase64url)(signatureBase64url);
+    }
+    async signTransaction(transaction, abis) {
+        const tx = await messenger.sendDomMessage("popup", "signer:signTransaction", {
+            signerAddress: this.address,
+            transaction,
+            abis,
+            kondorVersion: constants_1.kondorVersion,
+        });
+        transaction.id = tx.id;
+        transaction.header = tx.header;
+        transaction.operations = tx.operations;
+        transaction.signatures = tx.signatures;
+        return transaction;
+    }
+    async sendTransaction(transaction, options) {
+        const opts = {
+            ...this.sendOptions,
+            ...options,
+        };
+        if (opts === null || opts === void 0 ? void 0 : opts.beforeSend) {
+            throw new Error("beforeSend option is not supported in kondor");
+        }
+        const response = await messenger.sendDomMessage("popup", "signer:sendTransaction", {
+            signerAddress: this.address,
+            transaction,
+            optsSend: opts,
+            kondorVersion: constants_1.kondorVersion,
+        });
+        transaction.id = response.transaction.id;
+        transaction.header = response.transaction.header;
+        transaction.operations = response.transaction.operations;
+        transaction.signatures = response.transaction.signatures;
+        if (opts.broadcast) {
+            transaction.wait = async (type = "byTransactionId", timeout = 15000) => {
+                if (!this.provider)
+                    throw new Error("provider is undefined");
+                return this.provider.wait(transaction.id, type, timeout);
+            };
+        }
+        return {
+            transaction: transaction,
+            receipt: response.receipt,
+        };
+    }
+    async prepareBlock() {
+        throw new Error("prepareBlock is not available");
+    }
+    async signBlock() {
+        throw new Error("signBlock is not available");
+    }
+}
+exports.KondorSigner = KondorSigner;
 function getSigner(signerAddress, options) {
     if (!signerAddress)
         throw new Error("no signerAddress defined");
-    return {
-        getAddress: () => signerAddress,
-        signHash: (hash) => {
-            return messenger.sendDomMessage("popup", "signer:signHash", {
-                signerAddress,
-                hash,
-                kondorVersion: constants_1.kondorVersion,
-            });
-        },
-        signMessage: async (message) => {
-            const signatureBase64url = await messenger.sendDomMessage("popup", "signer:signMessage", {
-                signerAddress,
-                message,
-                kondorVersion: constants_1.kondorVersion,
-            });
-            return (0, utils_1.decodeBase64url)(signatureBase64url);
-        },
-        signTransaction: async (transaction, abis) => {
-            const tx = await messenger.sendDomMessage("popup", "signer:signTransaction", {
-                signerAddress,
-                transaction,
-                abis,
-                kondorVersion: constants_1.kondorVersion,
-            });
-            transaction.id = tx.id;
-            transaction.header = tx.header;
-            transaction.operations = tx.operations;
-            transaction.signatures = tx.signatures;
-            return transaction;
-        },
-        sendTransaction: async (transaction, optsSend) => {
-            if (optsSend === null || optsSend === void 0 ? void 0 : optsSend.beforeSend) {
-                throw new Error("beforeSend option is not supported in kondor");
-            }
-            const response = await messenger.sendDomMessage("popup", "signer:sendTransaction", {
-                signerAddress,
-                transaction,
-                optsSend,
-                kondorVersion: constants_1.kondorVersion,
-            });
-            transaction.id = response.transaction.id;
-            transaction.header = response.transaction.header;
-            transaction.operations = response.transaction.operations;
-            transaction.signatures = response.transaction.signatures;
-            transaction.wait = async (type = "byBlock", timeout = 60000) => {
-                return messenger.sendDomMessage("background", "provider:wait", {
-                    network: options ? options.network : "",
-                    txId: transaction.id,
-                    type,
-                    timeout,
-                    kondorVersion: constants_1.kondorVersion,
-                });
-            };
-            return {
-                transaction: transaction,
-                receipt: response.receipt,
-            };
-        },
-        prepareBlock: () => {
-            throw new Error("prepareBlock is not available");
-        },
-        signBlock: () => {
-            throw new Error("signBlock is not available");
-        },
-    };
+    return new KondorSigner({
+        provider: options === null || options === void 0 ? void 0 : options.provider,
+        address: signerAddress,
+        sendOptions: options === null || options === void 0 ? void 0 : options.sendOptions,
+    });
 }
 exports.getSigner = getSigner;
-exports["default"] = getSigner;
 
 
 /***/ }),
@@ -1206,7 +1220,7 @@ exports.decodeBase64url = decodeBase64url;
 /***/ 147:
 /***/ ((module) => {
 
-module.exports = JSON.parse('{"name":"kondor-js","version":"1.1.0","description":"Kondor Library","author":"Julian Gonzalez","repository":{"url":"https://github.com/joticajulian/kondor-js.git"},"homepage":"https://github.com/joticajulian/kondor-js.git","bugs":{"url":"https://github.com/joticajulian/kondor-js/issues"},"files":["lib","dist","src"],"main":"./lib/browser/src/index.js","types":"./lib/browser/src/index.d.ts","browser":"./lib/browser/src/index.js","scripts":{"build":"rimraf lib/browser && tsc -p tsconfig.browser.json","bundle":"yarn bundle:no-min && yarn bundle:min && yarn testfiles","bundle:min":"webpack --mode=production --config webpack.prod.config.js","bundle:no-min":"webpack --mode=production --config webpack.dev.config.js","lint":"yarn lint:prettier && yarn lint:eslint && yarn lint:tsc","lint:prettier":"prettier . --check","lint:eslint":"eslint . --ext .js,.ts","lint:tsc":"tsc --noEmit --incremental false","prerelease":"yarn bundle && yarn build","serve":"node test/server.js","testfiles":"copyfiles -u 3 node_modules/koilib/dist/koinos.min.js test/js && copyfiles -u 1 dist/kondor.min.js test/js"},"exports":{"./package.json":"./package.json",".":"./lib/browser/src/index.js"},"dependencies":{"multibase":"^4.0.6"},"devDependencies":{"@tsconfig/node12":"^1.0.11","@types/chrome":"^0.0.195","@typescript-eslint/eslint-plugin":"^5.35.1","@typescript-eslint/parser":"^5.35.1","copyfiles":"^2.4.1","eslint":"^8.22.0","eslint-config-airbnb-typescript":"^17.0.0","eslint-config-prettier":"^8.3.0","eslint-plugin-import":"^2.25.4","eslint-plugin-prettier":"^4.2.1","eslint-plugin-tsdoc":"^0.2.16","fastify":"^3.26.0","fastify-static":"^4.5.0","koilib":"^7.0.0","prettier":"^2.7.1","rimraf":"^3.0.2","ts-loader":"~8.2.0","typescript":"4.5.4","webpack":"^5.88.2","webpack-cli":"^5.1.4"}}');
+module.exports = JSON.parse('{"name":"kondor-js","version":"1.2.0","description":"Kondor Library","author":"Julian Gonzalez","repository":{"url":"https://github.com/joticajulian/kondor-js.git"},"homepage":"https://github.com/joticajulian/kondor-js.git","bugs":{"url":"https://github.com/joticajulian/kondor-js/issues"},"files":["lib","dist","src"],"main":"./lib/browser/src/index.js","types":"./lib/browser/src/index.d.ts","browser":"./lib/browser/src/index.js","scripts":{"build":"rimraf lib/browser && tsc -p tsconfig.browser.json","bundle":"yarn bundle:no-min && yarn bundle:min && yarn testfiles","bundle:min":"webpack --mode=production --config webpack.prod.config.js","bundle:no-min":"webpack --mode=production --config webpack.dev.config.js","lint":"yarn lint:prettier && yarn lint:eslint && yarn lint:tsc","lint:prettier":"prettier . --check","lint:eslint":"eslint . --ext .js,.ts","lint:tsc":"tsc --noEmit --incremental false","prerelease":"yarn bundle && yarn build","serve":"node test/server.js","testfiles":"copyfiles -u 3 node_modules/koilib/dist/koinos.min.js test/js && copyfiles -u 1 dist/kondor.min.js test/js"},"exports":{"./package.json":"./package.json",".":"./lib/browser/src/index.js"},"dependencies":{"multibase":"^4.0.6"},"devDependencies":{"@tsconfig/node12":"^1.0.11","@types/chrome":"^0.0.195","@typescript-eslint/eslint-plugin":"^5.35.1","@typescript-eslint/parser":"^5.35.1","copyfiles":"^2.4.1","eslint":"^8.22.0","eslint-config-airbnb-typescript":"^17.0.0","eslint-config-prettier":"^8.3.0","eslint-plugin-import":"^2.25.4","eslint-plugin-prettier":"^4.2.1","eslint-plugin-tsdoc":"^0.2.16","fastify":"^3.26.0","fastify-static":"^4.5.0","koilib":"^9.1.0","prettier":"^2.7.1","rimraf":"^3.0.2","ts-loader":"~8.2.0","typescript":"4.5.4","webpack":"^5.88.2","webpack-cli":"^5.1.4"}}');
 
 /***/ })
 
@@ -1248,7 +1262,7 @@ __webpack_unused_export__ = ({ value: true });
 const provider_1 = __webpack_require__(599);
 const signer_1 = __webpack_require__(942);
 const account_1 = __webpack_require__(339);
-window.kondor = { provider: provider_1.provider, getProvider: provider_1.getProvider, getSigner: signer_1.getSigner, getAccounts: account_1.getAccounts };
+window.kondor = { provider: provider_1.provider, getProvider: provider_1.getProvider, KondorSigner: signer_1.KondorSigner, getSigner: signer_1.getSigner, getAccounts: account_1.getAccounts };
 
 })();
 
