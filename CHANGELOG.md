@@ -22,7 +22,7 @@ All notable changes to this project will be documented in this file. 🤘
 ### 🚀 Features
 
 - Using koilib v6
-- prepareTransaction was removed from the signer to be aligned with koilib v6
+- prepareTransaction was removed from the signer to be aligned with koilib v6. This change also removes the providerPrepareTransaction introduced in v0.3.4 to prevent the double popup. Since prepareTransaction is not part anymore of the signer class the double popup issue is solved.
 
 ## [v0.4.2](https://github.com/joticajulian/kondor-js/releases/tag/v0.4.2) (2023-05-02)
 
@@ -44,3 +44,9 @@ All notable changes to this project will be documented in this file. 🤘
 - sign message is now available
 - getProvider function to be able to select the network
 - include kondor version in the calls
+
+## [v0.3.4](https://github.com/joticajulian/kondor-js/releases/tag/v0.3.4) (2022-12-24)
+
+### 🚀 Features
+
+- Introduction of providerPrepareTransaction in the options to fix the issue with double popups
