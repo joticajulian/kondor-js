@@ -57,13 +57,15 @@
 
       async function transferKoin() {
         divResult.hide();
-        const s = kondor.getSigner(inputFrom.value);
         const provider = new Provider(["https://harbinger-api.koinos.io"]);
-        s.provider = provider;
+        const signer = new kondor.KondorSigner({
+          address: inputFrom.value,
+          provider,
+        });
         try {
           // contract definition
           const koin = new Contract({
-            id: "19JntSm8pSNETT9aHTwAUHC5RMoaSmgZPJ",
+            id: "1EdLyQ67LW6HVU1dWoceP4firtyz77e37Y",
             abi: utils.tokenAbi,
             provider: kondor.getProvider("harbinger"),
             signer: kondor.getSigner(inputFrom.value, {
