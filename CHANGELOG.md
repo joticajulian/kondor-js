@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v1.2.1](https://github.com/joticajulian/kondor-js/releases/tag/v1.2.1) (2025-02-15)
+
+### 🚀 Features
+
+- new KondorSigner class
+- getSigner works as a KondorSigner class, then it's possible to update the provider
+
 ## [v1.1.0](https://github.com/joticajulian/kondor-js/releases/tag/v1.1.0) (2024-04-25)
 
 ### 🚀 Features
