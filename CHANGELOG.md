@@ -24,6 +24,12 @@ All notable changes to this project will be documented in this file. 🤘
 - Using koilib v6
 - prepareTransaction was removed from the signer to be aligned with koilib v6. This change also removes the providerPrepareTransaction introduced in v0.3.4 to prevent the double popup. Since prepareTransaction is not part anymore of the signer class the double popup issue is solved.
 
+## [v0.4.3](https://github.com/joticajulian/kondor-js/releases/tag/v0.4.3) (2023-07-29)
+
+### 🚀 Features
+
+- Bump libraries (koilib v5.6.1)
+
 ## [v0.4.2](https://github.com/joticajulian/kondor-js/releases/tag/v0.4.2) (2023-05-02)
 
 ### 🐛 Bug Fixes
