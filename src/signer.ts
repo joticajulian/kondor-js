@@ -111,8 +111,9 @@ export class KondorSigner implements SignerInterface {
         type: "byTransactionId" | "byBlock" = "byTransactionId",
         timeout = 15000
       ) => {
-        if (!this.provider) throw new Error("provider is undefined");
-        return this.provider.wait(transaction.id as string, type, timeout);
+        if (opts.provider) return opts.provider.wait(transaction.id as string, type, timeout);
+        if (this.provider) return this.provider.wait(transaction.id as string, type, timeout);
+        throw new Error("provider is undefined");
       };
     }
     return {
