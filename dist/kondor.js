@@ -1148,9 +1148,11 @@ class KondorSigner {
         transaction.signatures = response.transaction.signatures;
         if (opts.broadcast) {
             transaction.wait = async (type = "byTransactionId", timeout = 15000) => {
-                if (!this.provider)
-                    throw new Error("provider is undefined");
-                return this.provider.wait(transaction.id, type, timeout);
+                if (opts.provider)
+                    return opts.provider.wait(transaction.id, type, timeout);
+                if (this.provider)
+                    return this.provider.wait(transaction.id, type, timeout);
+                throw new Error("provider is undefined");
             };
         }
         return {
@@ -1220,7 +1222,7 @@ exports.decodeBase64url = decodeBase64url;
 /***/ 147:
 /***/ ((module) => {
 
-module.exports = JSON.parse('{"name":"kondor-js","version":"1.2.0","description":"Kondor Library","author":"Julian Gonzalez","repository":{"url":"https://github.com/joticajulian/kondor-js.git"},"homepage":"https://github.com/joticajulian/kondor-js.git","bugs":{"url":"https://github.com/joticajulian/kondor-js/issues"},"files":["lib","dist","src"],"main":"./lib/browser/src/index.js","types":"./lib/browser/src/index.d.ts","browser":"./lib/browser/src/index.js","scripts":{"build":"rimraf lib/browser && tsc -p tsconfig.browser.json","bundle":"yarn bundle:no-min && yarn bundle:min && yarn testfiles","bundle:min":"webpack --mode=production --config webpack.prod.config.js","bundle:no-min":"webpack --mode=production --config webpack.dev.config.js","lint":"yarn lint:prettier && yarn lint:eslint && yarn lint:tsc","lint:prettier":"prettier . --check","lint:eslint":"eslint . --ext .js,.ts","lint:tsc":"tsc --noEmit --incremental false","prerelease":"yarn bundle && yarn build","serve":"node test/server.js","testfiles":"copyfiles -u 3 node_modules/koilib/dist/koinos.min.js test/js && copyfiles -u 1 dist/kondor.min.js test/js"},"exports":{"./package.json":"./package.json",".":"./lib/browser/src/index.js"},"dependencies":{"multibase":"^4.0.6"},"devDependencies":{"@tsconfig/node12":"^1.0.11","@types/chrome":"^0.0.195","@typescript-eslint/eslint-plugin":"^5.35.1","@typescript-eslint/parser":"^5.35.1","copyfiles":"^2.4.1","eslint":"^8.22.0","eslint-config-airbnb-typescript":"^17.0.0","eslint-config-prettier":"^8.3.0","eslint-plugin-import":"^2.25.4","eslint-plugin-prettier":"^4.2.1","eslint-plugin-tsdoc":"^0.2.16","fastify":"^3.26.0","fastify-static":"^4.5.0","koilib":"^9.1.0","prettier":"^2.7.1","rimraf":"^3.0.2","ts-loader":"~8.2.0","typescript":"4.5.4","webpack":"^5.88.2","webpack-cli":"^5.1.4"}}');
+module.exports = JSON.parse('{"name":"kondor-js","version":"1.3.0","description":"Kondor Library","author":"Julian Gonzalez","repository":{"url":"https://github.com/joticajulian/kondor-js.git"},"homepage":"https://github.com/joticajulian/kondor-js.git","bugs":{"url":"https://github.com/joticajulian/kondor-js/issues"},"files":["lib","dist","src"],"main":"./lib/browser/src/index.js","types":"./lib/browser/src/index.d.ts","browser":"./lib/browser/src/index.js","scripts":{"build":"rimraf lib/browser && tsc -p tsconfig.browser.json","bundle":"yarn bundle:no-min && yarn bundle:min && yarn testfiles","bundle:min":"webpack --mode=production --config webpack.prod.config.js","bundle:no-min":"webpack --mode=production --config webpack.dev.config.js","lint":"yarn lint:prettier && yarn lint:eslint && yarn lint:tsc","lint:prettier":"prettier . --check","lint:eslint":"eslint . --ext .js,.ts","lint:tsc":"tsc --noEmit --incremental false","prerelease":"yarn bundle && yarn build","serve":"node test/server.js","testfiles":"copyfiles -u 3 node_modules/koilib/dist/koinos.min.js test/js && copyfiles -u 1 dist/kondor.min.js test/js"},"exports":{"./package.json":"./package.json",".":"./lib/browser/src/index.js"},"dependencies":{"multibase":"^4.0.6"},"devDependencies":{"@tsconfig/node12":"^1.0.11","@types/chrome":"^0.0.195","@typescript-eslint/eslint-plugin":"^5.35.1","@typescript-eslint/parser":"^5.35.1","copyfiles":"^2.4.1","eslint":"^8.22.0","eslint-config-airbnb-typescript":"^17.0.0","eslint-config-prettier":"^8.3.0","eslint-plugin-import":"^2.25.4","eslint-plugin-prettier":"^4.2.1","eslint-plugin-tsdoc":"^0.2.16","fastify":"^3.26.0","fastify-static":"^4.5.0","koilib":"^9.4.0","prettier":"^2.7.1","rimraf":"^3.0.2","ts-loader":"~8.2.0","typescript":"4.5.4","webpack":"^5.88.2","webpack-cli":"^5.1.4"}}');
 
 /***/ })
 

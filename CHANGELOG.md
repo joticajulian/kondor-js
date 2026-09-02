@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. 🤘
 
+## [v1.3.0](https://github.com/joticajulian/kondor-js/releases/tag/v1.3.0) (2026-09-02)
+
+### 🚀 Features
+
+- sendTransaction now gets the provider from the options. Thanks to this, it is not required to define a provider for the KondorSigner instance. It will get it from the contract class. Note: This is to define the provider for the wait function of the transaction. The provider that actually sends the transaction is independent and defined in the Kondor App.
+
 ## [v1.2.1](https://github.com/joticajulian/kondor-js/releases/tag/v1.2.1) (2025-02-15)
 
 ### 🚀 Features
